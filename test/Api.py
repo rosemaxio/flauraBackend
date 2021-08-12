@@ -12,5 +12,5 @@ def get_test_value(accessToken, method, attr):
         value = request.args.get('value')
         print('\nSCHREIBEN\n', value, '\n\n')
         return ''
-    
+
     return ''
