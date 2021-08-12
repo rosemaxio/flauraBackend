@@ -1,11 +1,16 @@
 from flask import Flask, request, Response
+
 from . import db
+
 
 class JsonResponse(Response):
     default_mimetype = 'application/json'
 
+
 class JsonFlask(Flask):
     response_class = JsonResponse
+
+
 
 app = JsonFlask(__name__)
 app.config["DEBUG"] = True
@@ -38,10 +43,10 @@ def getPlant():
 def getPlantList():
     return db.getAllPlants()
 
-# @app.route("/api/v1/newPlant")
+# @plants.route("/api/v1/newPlant")
 # def setNewPlant(name, waterAmount, critMoist, sleepTime)
 #   db.setNewPlant(name, waterAmount, critMoist, sleepTime)
 #   return
 
 # if __name__ == '__main__':
-#    app.run(host='0.0.0.0:5000')
+#    plants.run(host='0.0.0.0:5000')

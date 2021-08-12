@@ -11,9 +11,9 @@ DATABASE_URL = f'mongodb+srv://{os.environ.get("user")}:{os.environ.get("passwor
 
 client = pymongo.MongoClient(DATABASE_URL)  # establish connection with database
 
-# app.config['MONGO_DBNAME'] = 'restdb'
-# app.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
-# mongo = PyMongo(app)
+# plants.config['MONGO_DBNAME'] = 'restdb'
+# plants.config['MONGO_URI'] = 'mongodb://localhost:27017/restdb'
+# mongo = PyMongo(plants)
 
 mydb = client.flaura
 mycol = mydb.plants
