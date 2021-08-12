@@ -6,6 +6,7 @@ from keras.models import load_model
 import simplejpeg
 
 
+
 def jsonResponse(data):
     return Response(data, mimetype='application/json')
 
