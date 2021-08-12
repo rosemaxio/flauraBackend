@@ -20,23 +20,6 @@ def index():
 def get_plants(name):
     return jsonResponse(db.getPlantsByName(name))
 
-
-@plants.route("/api/v1/plants", methods=["GET"])
-def getPlant():
-    if 'name' in request.args:
-        plantName = request.args['name']
-    else:
-        return "ERROR: No plant Name provided. Specify a name!"
-
-    # results = mycol.find(plantName)
-    return db.getPlantByName(plantName)
-
-
-@plants.route("/api/v1/plants/", methods=["GET"])
-def getPlantList():
-    return db.getAllPlants()
-
-
 def predict(base64String):
     model = load_model('plants/model/keras_model.h5')
     data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
