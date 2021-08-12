@@ -6,6 +6,8 @@ from keras.models import load_model
 import simplejpeg
 
 
+model = load_model('plants/model/keras_model.h5')
+
 
 def jsonResponse(data):
     return Response(data, mimetype='application/json')
@@ -22,7 +24,6 @@ def get_plants(name):
     return jsonResponse(db.getPlantsByName(name))
 
 def predict(base64String):
-    model = load_model('plants/model/keras_model.h5')
     data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
     image = simplejpeg.decode_jpeg(bytes(base64String, "ascii"))
     normalized_image_array = (image.astype(np.float32) / 127.0) - 1
@@ -44,7 +45,7 @@ def searchPlant():
     with open('plants/model/labels.txt', 'r') as label:
         line = label.readlines()
         plant = line[max[0]].rstrip()
-    return plant[2:]
+    return jsonResponse(plant[2:])
 
 # @plants.route("/api/v1/newPlant")
 # def setNewPlant(name, waterAmount, critMoist, sleepTime)
