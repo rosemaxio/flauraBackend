@@ -1,36 +1,41 @@
 from flask import Flask, request, jsonify
+from flask.json import dump
+
+from . import db
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
+
 @app.route("/")
 def index():
-    return "<h1>Hello, World!</h1>"
+    return "<h2 align=center>Welcome to</h2>\n<h1 align=center>Flaura</h1>"
 
-@app.route("/api/v1/plant", methods=["GET"])
+
+#test to insert data to the data base
+@app.route("/test")
+def showTest():
+    return db.test()
+
+@app.route("/api/v1/plants/", methods=["GET"])
+def getPlantList():
+    return db.getAllPlants()
+
+
+@app.route("/api/v1/plants", methods=["GET"])
 def getPlant():
-    if 'id' in request.args:
-        id = int(request.args['id'])
+    if 'name' in request.args:
+        plantName = int(request.args['name'])
     else:
-        return "ERROR: No ID field provided. Specify an ID!"
+        return "ERROR: No plant Name provided. Specify a name!"
 
-    results = [42]
+    # results = mycol.find(plantName)
+    return db.getPlantByName(plantName)
 
-#    for plant in plants:
- #       if plant['id'] == id:
-  #          results.append(plant)
-
-    return jsonify(results)
-
-# def app(environment, startResponse):
-#    data = (b"No data here\n")
-#    status = "200 OK"
-#    responseHeaders = [
-#        ('Content-type', 'text/plain'),
-#        ('Content-Length', str(len(data)))
-#    ]
-#    startResponse(status, responseHeaders)
-#    return iter([data])
+# @app.route("/api/v1/newPlant")
+#def setNewPlant(name, waterAmount, critMoist, sleepTime)
+#   db.setNewPlant(name, waterAmount, critMoist, sleepTime)
+#   return
 
 # if __name__ == '__main__':
 #    app.run(host='0.0.0.0:5000')
