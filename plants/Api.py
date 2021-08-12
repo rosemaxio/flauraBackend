@@ -1,34 +1,23 @@
 from flask import Flask, request, Response
-
-from . import db
-
-
-class JsonResponse(Response):
-    default_mimetype = 'application/json'
+from . import db, plants
 
 
-class JsonFlask(Flask):
-    response_class = JsonResponse
+def jsonResponse(data):
+    return Response(data, mimetype='application/json')
 
 
-
-app = JsonFlask(__name__)
-app.config["DEBUG"] = True
-app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-
-
-@app.route("/")
+@plants.route("/")
 def index():
     return "<h2 align=center>Welcome to</h2>\n<h1 align=center>Flaura</h1>"
 
 
-@app.route('/api/plants/', defaults={'name': ""})
-@app.route('/api/plants/<name>')
+@plants.route('/api/plants/', defaults={'name': ""})
+@plants.route('/api/plants/<name>')
 def get_plants(name):
-    return db.getPlantsByName(name)
+    return jsonResponse(db.getPlantsByName(name))
 
 
-@app.route("/api/v1/plants", methods=["GET"])
+@plants.route("/api/v1/plants", methods=["GET"])
 def getPlant():
     if 'name' in request.args:
         plantName = request.args['name']
@@ -39,7 +28,7 @@ def getPlant():
     return db.getPlantByName(plantName)
 
 
-@app.route("/api/v1/plants/", methods=["GET"])
+@plants.route("/api/v1/plants/", methods=["GET"])
 def getPlantList():
     return db.getAllPlants()
 

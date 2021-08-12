@@ -1,4 +1,8 @@
-from plants.Api import app
+from flask import Flask
+from plants import plants
+from users import users
 
-if __name__ == '__main__':
-    app.run()
+app = Flask(__name__)
+app.register_blueprint(plants)
+app.register_blueprint(users)
+app.run(debug=True)
