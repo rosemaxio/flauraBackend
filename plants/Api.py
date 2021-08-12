@@ -1,5 +1,6 @@
 from flask import Flask, request, Response
 from . import db, plants
+from bson.json_util import dumps
 
 import numpy as np
 from keras.models import load_model
@@ -45,7 +46,9 @@ def searchPlant():
     with open('plants/model/labels.txt', 'r') as label:
         line = label.readlines()
         plant = line[max[0]].rstrip()
-    return jsonResponse(plant[2:])
+
+    data = dumps({'result': plant[2:]})
+    return jsonResponse(data)
 
 # @plants.route("/api/v1/newPlant")
 # def setNewPlant(name, waterAmount, critMoist, sleepTime)
