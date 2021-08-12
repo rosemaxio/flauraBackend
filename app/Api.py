@@ -7,7 +7,7 @@ app = Flask(__name__)
 def index():
     return "<h1>Hello, World!</h1>"
 
-@app.route("/api/v1/plant", method=["GET"])
+@app.route("/api/v1/plant", methods=["GET"])
 def getPlant():
     if 'id' in request.args:
         id = int(request.args['id'])
