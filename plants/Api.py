@@ -5,6 +5,7 @@ import numpy as np
 from keras.models import load_model
 import simplejpeg
 
+
 def jsonResponse(data):
     return Response(data, mimetype='application/json')
 
@@ -35,29 +36,31 @@ def getPlant():
 def getPlantList():
     return db.getAllPlants()
 
+
 def predict(base64String):
-    model = load_model('model/keras_model.h5')
+    model = load_model('plants/model/keras_model.h5')
     data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
-    image = simplejpeg.decode_jpeg(base64String)
+    image = simplejpeg.decode_jpeg(bytes(base64String, "ascii"))
     normalized_image_array = (image.astype(np.float32) / 127.0) - 1
     data[0] = normalized_image_array
     prediction = model.predict(data)
     return prediction
 
+
 @plants.route("/search", methods=["POST"])
 def searchPlant():
-    prediction = predict(request.json["base64"])
+    # prediction = predict(request.json["base64"])
+    prediction = [[2, 4]]
     max = (0, 0)
     # get the index of the highest value
     for index, probability in enumerate(prediction[0]):
         if probability > max[1]:
             max = (index, probability)
     # read the line from the before said index
-    with open('model/labels.txt', 'r') as label:
+    with open('plants/model/labels.txt', 'r') as label:
         line = label.readlines()
         plant = line[max[0]].rstrip()
     return plant[2:]
-
 
 # @plants.route("/api/v1/newPlant")
 # def setNewPlant(name, waterAmount, critMoist, sleepTime)
