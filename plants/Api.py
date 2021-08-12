@@ -45,8 +45,8 @@ def predict(base64String):
     return prediction
 
 @plants.route("/search", methods=["POST"])
-def searchPlant(base64String):
-    prediction = predict(base64String)
+def searchPlant():
+    prediction = predict(request.json.base64)
     max = (0, 0)
     # get the index of the highest value
     for index, probability in enumerate(prediction[0]):
