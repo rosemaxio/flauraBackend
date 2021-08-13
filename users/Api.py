@@ -164,13 +164,16 @@ def createNewPot():
         return jsonResponse(json.dumps(bestesAntwortDict))
     else:
         newPot = {}
-        newPot["token"] = generatePotToken()
+        newToken = generatePotToken()
+        while (mycol.find_one({"pots.token": newToken}) != None):
+            newToken = generatePotToken()
+        newPot["token"] = newToken
         newPot["sleepTime"] = 1
         newPot["criticalMoisture"] = 0
         newPot["waterAmountML"] = 0
         susUser["pots"].append(newPot)
         mycol.save(susUser)
-        return
+        return 'hopefully successful'
 
 
 @users.route('/api/users/deletePot', methods=["POST"])
