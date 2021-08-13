@@ -69,16 +69,12 @@ def registerUser():
     ###                            "name", "email", "emailconfirm", "password", "passwordconfirm"
     bestesAntwortDict = {}
     reqJson = request.get_json(force=True)
-    if (reqJson["email"] != reqJson["emailconfirm"] or reqJson["password"] != reqJson["passwordconfirm"]):
-        bestesAntwortDict["msg"] = "E-Mail-Adressen oder Passwörter stimmen nicht überein."
-        bestesAntwortDict["successful"] = False
-        return dumps(bestesAntwortDict)
-    if (request.get_json(force=True)["name"] == ""):
-        bestesAntwortDict["msg"] = "Name darf nicht leer sein."
+    if (reqJson["password"] != reqJson["passwordconfirm"]):
+        bestesAntwortDict["msg"] = "Passwörter stimmen nicht überein."
         bestesAntwortDict["successful"] = False
         return dumps(bestesAntwortDict)
     iniLoginToken = generateLoginToken()
-    newuser = {"name": reqJson["name"], "email":  reqJson["email"],"pwsha256": generatePWhash(request.json["password"]), "pots": [], "tokens":[iniLoginToken]}
+    newuser = {"email":  reqJson["email"],"pwsha256": generatePWhash(request.json["password"]), "pots": [], "tokens":[iniLoginToken]}
     new_id = mycol.insert_one(newuser).inserted_id
     bestesAntwortDict["successful"] = True
     bestesAntwortDict["initialToken"] = iniLoginToken
