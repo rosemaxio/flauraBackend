@@ -58,6 +58,7 @@ def generateLoginToken(length=32):
 
 
 def generatePotToken(length=10):
+    # TODO was passiert wenn zwei Pots zufällig den gleichen Token bekommen
     # Nach https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits
     return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(length))
 
@@ -164,9 +165,9 @@ def createNewPot():
     else:
         newPot = {}
         newPot["token"] = generatePotToken()
-        newPot["sleepTime"] = 1;
-        newPot["criticalMoisture"] = 0;
-        newPot["waterAmmountML"] = 0;
+        newPot["sleepTime"] = 1
+        newPot["criticalMoisture"] = 0
+        newPot["waterAmountML"] = 0
         susUser["pots"].append(newPot)
         mycol.save(susUser)
         return
@@ -219,8 +220,8 @@ def setPotValues():
                     pot["sleepTime"] = reqJson["sleepTime"];
                 if "criticalMoisture" in reqJson.keys():
                     pot["criticalMoisture"] = reqJson["criticalMoisture"];
-                if "waterAmmountML" in reqJson.keys():
-                    pot["waterAmmountML"] = reqJson["waterAmmountML"];
+                if "waterAmountML" in reqJson.keys():
+                    pot["waterAmountML"] = reqJson["waterAmountML"];
 
                 wasFoundAndEdited = True
                 mycol.save(susUser)
