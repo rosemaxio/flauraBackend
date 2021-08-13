@@ -89,10 +89,10 @@ def registerUser():
 @users.route('/api/users/loginRequest', methods=["POST"])
 def attemptLogin():
     bestesAntwortDict = {}
-    susUser = mycol.find_one({"email": request.json["username"]})
+    susUser = mycol.find_one({"email": request.json["email"]})
     ## ToDo: Was machen wir, wenn es diesen User gar nicht gibt? Was kommt dann als Antowort zurück? Niemand weiß es...
     # Gucke, ob das was wir gesendet bekommen haben nachdem es durch die Funktion gejagt wurde mit dem übereinstimmt was bei uns in der DB steht
-    if (generatePWhash(request.json["pw"]) == susUser["pwsha256"]):
+    if (generatePWhash(request.json["password"]) == susUser["pwsha256"]):
         bestesAntwortDict["msg"] = "Login erfolgreich"
         ## Wir generieren uns einen Token, mit dem man sich dann später identifizieren kann
         newtoken = generateLoginToken()
@@ -186,3 +186,31 @@ def deletePot():
         return jsonResponse(json.dumps(bestesAntwortDict))
 
 
+@users.route('/api/users/newPot', methods=["POST"])
+def setPotValues():
+    # Diese Funktion bekommt einen Login-Token, einen Pot-Token, einen sleepTime-Wert (optional), einen criticalMoisture-Wert übergeben. Sie denkt sich einen Pot-Token für den neuen Pot aus, erzeugt ihn und fügen ihn hinzu
+    bestesAntwortDict = {}
+    susUser = mycol.find_one({"tokens": request.json["token"]})
+    if susUser == None:
+        # Wenn nach dieser Suchaktion susUser None ist, dann war das kein richtiger Token!
+        bestesAntwortDict["msg"] = "Incorrect token"
+        bestesAntwortDict["error"] = True
+        return jsonResponse(json.dumps(bestesAntwortDict))
+    else:
+        # Gucken, ob dieser User einen Pot mit diesem PotToken hat, und wenn ja dessen Daten ändern
+        wasFoundAndEdited = False
+        for pot in susUser["pots"]:
+            if (pot["token"] == request.json["PotToken"]):
+                if "sleepTime" in request.json.keys():
+                    pot["sleepTime"] = request.json["sleepTime"];
+                if "criticalMoisture" in request.json.keys():
+                    pot["criticalMoisture"] = request.json["criticalMoisture"];
+                if "waterAmmountML" in request.json.keys():
+                    pot["waterAmmountML"] = request.json["waterAmmountML"];
+
+                wasFoundAndEdited = True
+                mycol.save(susUser)
+        if not wasFoundAndEdited:
+            bestesAntwortDict["msg"] = "Pot either not existing or not yours"
+            bestesAntwortDict["error"] = True
+            return jsonResponse(json.dumps(bestesAntwortDict))
