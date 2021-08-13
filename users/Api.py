@@ -62,10 +62,10 @@ def usersA():
 
 @users.route('/users/loginForm')
 def loginForm():
-    return '<center>Ja Moin. Dann registrier dich mal ne Runde!<br><br><form method="post" action="/users/api/register">Name: <input type="text" name="name"><br>E-Mail: <input type="email" name="email"><br>E-Mail wiederholen: <input type="email" name="emailconfirm"><br>Passwort: <input type="password" name="password"><br>Passwort wiederholen: <input type="password" name="passwordconfirm"><br><br><input type="submit" value="Abschicken"></form> </center>'
+    return '<center>Ja Moin. Dann registrier dich mal ne Runde!<br><br><form method="post" action="/api/users/register">Name: <input type="text" name="name"><br>E-Mail: <input type="email" name="email"><br>E-Mail wiederholen: <input type="email" name="emailconfirm"><br>Passwort: <input type="password" name="password"><br>Passwort wiederholen: <input type="password" name="passwordconfirm"><br><br><input type="submit" value="Abschicken"></form> </center>'
     # Diese Seite funktioniert nicht mehr, seit wir in der API-Funktion einen anderen Typ erwarten
 
-@users.route('/users/api/register', methods=["POST"])
+@users.route('/api/users/register', methods=["POST"])
 def registerUser():
     ### Diese Funktion möchte einen Namen, zwei E-Mails, zwei Passwörter und trägt den User in die DB ein
     ###                            "name", "email", "emailconfirm", "password", "passwordconfirm"
@@ -86,7 +86,7 @@ def registerUser():
     return json.dumps(bestesAntwortDict)
 
 
-@users.route('/users/api/loginRequest', methods=["POST"])
+@users.route('/api/users/loginRequest', methods=["POST"])
 def attemptLogin():
     bestesAntwortDict = {}
     susUser = mycol.find_one({"email": request.json["username"]})
@@ -108,7 +108,7 @@ def attemptLogin():
         bestesAntwortDict["loginSuccessful"] = False
     return json.dumps(bestesAntwortDict)
 
-@users.route('/users/api/logoutRequest', methods=["POST"])
+@users.route('/api/users/logoutRequest', methods=["POST"])
 def attemptLogout():
     bestesAntwortDict = {}
     susUser = mycol.find_one({"tokens": request.json["token"]})
@@ -126,7 +126,7 @@ def attemptLogout():
 
 
 
-@users.route('/users/api/getUser', methods=["POST"])
+@users.route('/api/users/getUser', methods=["POST"])
 def getUserInfobyToken():
     # Diese Funktion will einen token im POST-Header haben, und wenn es ein echter ist, kommt das entsprechende User-Objekt zurück
     bestesAntwortDict = {}
@@ -139,7 +139,7 @@ def getUserInfobyToken():
     else:
         return jsonResponse(str(susUser))
 
-@users.route('/users/api/newPot', methods=["POST"])
+@users.route('/api/users/newPot', methods=["POST"])
 def createNewPot():
     # Diese Funktion bekommt einen Login-Token übergeben. Sie denkt sich einen Pot-Token für den neuen Pot aus, erzeugt ihn und fügen ihn hinzu
     bestesAntwortDict = {}
@@ -159,7 +159,7 @@ def createNewPot():
         mycol.save(susUser)
         return newPot["token"]
 
-@users.route('/users/api/deletePot', methods=["POST"])
+@users.route('/api/users/deletePot', methods=["POST"])
 def deletePot():
     # Diese Funktion bekommt einen Login-Token und einen Pot-Token übergeben. Sie löscht den Pot mit diesem Token
     bestesAntwortDict = {}
@@ -184,3 +184,5 @@ def deletePot():
         bestesAntwortDict["msg"] = "Pot deleted"
         bestesAntwortDict["error"] = False
         return jsonResponse(json.dumps(bestesAntwortDict))
+
+
