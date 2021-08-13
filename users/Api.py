@@ -176,7 +176,7 @@ def createNewPot():
 def deletePot():
     # Diese Funktion bekommt einen Login-Token und einen Pot-Token übergeben. Sie löscht den Pot mit diesem Token
     bestesAntwortDict = {}
-    susUser = mycol.find_one({"tokens": request.json["LoginToken"]})
+    susUser = mycol.find_one({"tokens": request.json["loginToken"]})
     if susUser == None:
         # Wenn nach dieser Suchaktion susUser None ist, dann war das kein richtiger Token!
         bestesAntwortDict["msg"] = "Incorrect token"
@@ -186,7 +186,7 @@ def deletePot():
         # Gucken, ob dieser User einen Pot mit diesem PotToken hat, und wenn ja diesen Löschen
         wasFoundAndDeleted = False
         for pot in susUser["pots"]:
-            if (pot["token"] == request.json["PotToken"]):
+            if (pot["token"] == request.json["potToken"]):
                 susUser["pots"].remove(pot)
                 wasFoundAndDeleted = True
                 mycol.save(susUser)
