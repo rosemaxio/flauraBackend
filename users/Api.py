@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 from flask import jsonify, Response
 import pymongo
-import hashlib # Die brauchen wir für die Passwörter
+import hashlib  # Die brauchen wir für die Passwörter
 import string
 from bson.json_util import dumps
 
@@ -26,8 +26,11 @@ client = pymongo.MongoClient(DATABASE_URL)  # establish connection with database
 mydb = client.flaura
 mycol = mydb.users
 
+
 def jsonResponse(data):
     return Response(data, mimetype='application/json')
+
+
 ##################### Ende des Codes, den ich einfach nur von Tina übernommen habe #######################
 ###### Dokumentation der Daten für Login
 ###### E-Mail: userelement["email"]
@@ -41,13 +44,18 @@ def getAllUsers():
     ppl = dumps(list_cur)
     return ppl
 
+
 def generatePWhash(password):
     zuhashen = password + pwsalt
     return hashlib.sha256(zuhashen.encode('utf-8')).hexdigest()
 
+
 def generateLoginToken(length=32):
     # Nach https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits
-    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(length))
+    return ''.join(
+        random.SystemRandom().choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in
+        range(length))
+
 
 def generatePotToken(length=10):
     # Nach https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits
@@ -58,23 +66,30 @@ def generatePotToken(length=10):
 def usersA():
     return jsonResponse(getAllUsers())
 
+
 @users.route('/users/loginForm')
 def loginForm():
     return '<center>Ja Moin. Dann registrier dich mal ne Runde!<br><br><form method="post" action="/api/users/register">Name: <input type="text" name="name"><br>E-Mail: <input type="email" name="email"><br>E-Mail wiederholen: <input type="email" name="emailconfirm"><br>Passwort: <input type="password" name="password"><br>Passwort wiederholen: <input type="password" name="passwordconfirm"><br><br><input type="submit" value="Abschicken"></form> </center>'
     # Diese Seite funktioniert nicht mehr, seit wir in der API-Funktion einen anderen Typ erwarten
 
+
 @users.route('/api/users/register', methods=["POST"])
 def registerUser():
-    ### Diese Funktion möchte einen Namen, zwei E-Mails, zwei Passwörter und trägt den User in die DB ein
-    ###                            "name", "email", "emailconfirm", "password", "passwordconfirm"
+    ### Diese Funktion möchte eine E-Mail, zwei Passwörter und trägt den User in die DB ein
+    ###                           "email", "password", "passwordconfirm"
     bestesAntwortDict = {}
     reqJson = request.get_json(force=True)
-    if (reqJson["password"] != reqJson["passwordconfirm"]):
+    if reqJson["password"] != reqJson["passwordconfirm"]:
         bestesAntwortDict["msg"] = "Passwörter stimmen nicht überein."
         bestesAntwortDict["successful"] = False
         return dumps(bestesAntwortDict)
+    if mycol.countDocuments({"email": reqJson["email"]}) > 0:
+        bestesAntwortDict["msg"] = "Email already exists"
+        bestesAntwortDict["successful"] = False
+        return dumps(bestesAntwortDict)
     iniLoginToken = generateLoginToken()
-    newuser = {"email":  reqJson["email"],"pwsha256": generatePWhash(request.json["password"]), "pots": [], "tokens":[iniLoginToken]}
+    newuser = {"email": reqJson["email"], "pwsha256": generatePWhash(request.json["password"]), "pots": [],
+               "tokens": [iniLoginToken]}
     new_id = mycol.insert_one(newuser).inserted_id
     bestesAntwortDict["successful"] = True
     bestesAntwortDict["initialToken"] = iniLoginToken
@@ -122,7 +137,6 @@ def attemptLogout():
     return json.dumps(bestesAntwortDict)
 
 
-
 @users.route('/api/users/getUser', methods=["POST"])
 def getUserInfobyToken():
     # Diese Funktion will einen token im POST-Header haben, und wenn es ein echter ist, kommt das entsprechende User-Objekt zurück
@@ -135,6 +149,7 @@ def getUserInfobyToken():
         return jsonResponse(json.dumps(bestesAntwortDict))
     else:
         return jsonResponse(dumps(susUser))
+
 
 @users.route('/api/users/newPot', methods=["POST"])
 def createNewPot():
@@ -155,6 +170,7 @@ def createNewPot():
         susUser["pots"].append(newPot)
         mycol.save(susUser)
         return newPot["token"]
+
 
 @users.route('/api/users/deletePot', methods=["POST"])
 def deletePot():
