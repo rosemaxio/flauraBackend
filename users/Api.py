@@ -84,10 +84,10 @@ def registerUser():
         bestesAntwortDict["msg"] = "Passwörter stimmen nicht überein."
         bestesAntwortDict["successful"] = False
         return dumps(bestesAntwortDict)
-    if mycol.countDocuments({"email": reqJson["email"]}) > 0:
-        bestesAntwortDict["msg"] = "Email already exists"
-        bestesAntwortDict["successful"] = False
-        return dumps(bestesAntwortDict)
+    #if mycol.countDocuments({"email": reqJson["email"]}) > 0:
+    #    bestesAntwortDict["msg"] = "Email already exists"
+    #    bestesAntwortDict["successful"] = False
+    #    return dumps(bestesAntwortDict)
     iniLoginToken = generateLoginToken()
     newuser = {"email": reqJson["email"], "pwsha256": generatePWhash(request.json["password"]), "pots": [],
                "tokens": [iniLoginToken]}
