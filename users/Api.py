@@ -215,7 +215,7 @@ def setPotValues():
         # Gucken, ob dieser User einen Pot mit diesem PotToken hat, und wenn ja dessen Daten ändern
         wasFoundAndEdited = False
         for pot in susUser["pots"]:
-            if (pot["token"] == reqJson["PotToken"]):
+            if (pot["token"] == reqJson["potToken"]):
                 if "sleepTime" in reqJson.keys():
                     pot["sleepTime"] = reqJson["sleepTime"];
                 if "criticalMoisture" in reqJson.keys():
