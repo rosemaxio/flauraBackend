@@ -16,7 +16,7 @@ def jsonResponse(data):
 
 @plants.route("/")
 def index():
-    return '<h2 align=center>Welcome to</h2>\n<h1 align=center>Flaura</h1><br/><br/><button onclick="window.ReactNativeWebView.postMessage(\"WebView message\")">Test</button>'
+    return '<h2 align=center>Welcome to</h2>\n<h1 align=center>Flaura</h1><br/><br/><button onclick="alert(\'Deine Mudda\')">Test</button><script>document.addEventListener("message", function (event) {window.ReactNativeWebView.postMessage(event.data);}, false);</script>'
 
 
 @plants.route('/api/plants/', defaults={'name': ""})
