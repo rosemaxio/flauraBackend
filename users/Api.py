@@ -57,7 +57,8 @@ def usersA():
 
 @users.route('/users/loginForm')
 def loginForm():
-    return '<center>Ja Moin. Dann log dich mal ne Runde ein!<br><br><form method="post" action="/users/api/loginRequest">Username: <input type="text" name="username"><br>Passwort: <input type="password" name="pw"><br><br><input type="submit" value="Abschicken"></form> </center>'
+    return '<center>Ja Moin. Dann log dich mal ne Runde ein!<br><br><form method="post" action="/users/api/getUser">Token: <input type="text" name="token"><br>Passwort: <input type="password" name="pw"><br><br><input type="submit" value="Abschicken"></form> </center>'
+    # Diese Seite funktioniert nicht mehr, seit wir in der API-Funktion einen anderen Typ erwarten
 
 @users.route('/users/api/loginRequest', methods=["POST"])
 def attemptLogin():
@@ -65,7 +66,7 @@ def attemptLogin():
     susUser = mycol.find_one({"email": request.form["username"]})
     ## ToDo: Was machen wir, wenn es diesen User gar nicht gibt? Was kommt dann als Antowort zurück? Niemand weiß es...
     # Gucke, ob das was wir gesendet bekommen haben nachdem es durch die Funktion gejagt wurde mit dem übereinstimmt was bei uns in der DB steht
-    if (generatePWhash(request.form["pw"]) == susUser["pwsha256"]):
+    if (generatePWhash(request.json["pw"]) == susUser["pwsha256"]):
         bestesAntwortDict["msg"] = "Login erfolgreich"
         ## Wir generieren uns einen Token, mit dem man sich dann später identifizieren kann
         newtoken = generateToken()
@@ -79,10 +80,20 @@ def attemptLogin():
     else:
         bestesAntwortDict["msg"] = "Login nicht erfolgreich"
         bestesAntwortDict["loginSuccessful"] = False
-
-
     return json.dumps(bestesAntwortDict)
 
+@users.route('/users/api/getUser', methods=["POST"])
+def getUserInfobyToken():
+    # Diese Funktion will einen token im POST-Header haben, und wenn es ein echter ist, kommt das entsprechende User-Objekt zurück
+    bestesAntwortDict = {}
+    susUser = mycol.find_one({"tokens": request.form["token"]})
+    if susUser == None:
+        # Wenn nach dieser Suchaktion susUser None ist, dann war das kein richtiger Token!
+        bestesAntwortDict["msg"] = "Incorrect token"
+        bestesAntwortDict["error"] = True
+        return jsonResponse(json.dumps(bestesAntwortDict))
+    else:
+        return jsonResponse(str(susUser))
 
 
 #### Ab hier kommen Testfunktionen, die entfernt werden sollten, sobald das Testen fertig ist
