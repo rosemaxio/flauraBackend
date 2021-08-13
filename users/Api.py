@@ -169,7 +169,7 @@ def createNewPot():
         newPot["waterAmmountML"] = 0;
         susUser["pots"].append(newPot)
         mycol.save(susUser)
-        return newPot["token"]
+        return jsonResponse({"potToken": newPot["token"]})
 
 
 @users.route('/api/users/deletePot', methods=["POST"])
