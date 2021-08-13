@@ -27,7 +27,8 @@ def getUserByPlantToken(token):
     else:
         return susUser
 
-
+# Updates the field <name> of Pot with Token <token> to <newValue>
+# TODO maybe add all changes to a new database, for history (e.g. moisture of pot in the last 14 days)
 def updateTestValue(token, name, newValue):
     newData = getUserByPlantToken(token)
     if newData != "noUser":

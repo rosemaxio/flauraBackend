@@ -34,7 +34,7 @@ def getAllPlants():
 
 
 def setNewPlant(name, waterAmount, critMoist, sleepTime):
-    newPlant = {"name": name, "waterAmmountML": waterAmount, "criticalMoisture": critMoist, "sleepTime": sleepTime}
+    newPlant = {"name": name, "waterAmountML": waterAmount, "criticalMoisture": critMoist, "sleepTime": sleepTime}
     mycol.insert_one(newPlant)
 
 # function Get List of Plants that contain <name>
