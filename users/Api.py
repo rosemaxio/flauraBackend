@@ -5,12 +5,12 @@ from flask import request
 import json
 ##### Hier kommt code, den ich einfach von Tina so übernommen habe. Wenn er schlecht ist ist Tina schuld ############
 import os
-from bson.json_util import dumps
 from dotenv import load_dotenv
 from flask import jsonify, Response
 import pymongo
 import hashlib # Die brauchen wir für die Passwörter
 import string
+from bson.json_util import dumps
 
 load_dotenv()  # use dotenv to hide sensitive credential as environment variables
 DATABASE_URL = f'mongodb+srv://{os.environ.get("dbUser")}:{os.environ.get("dbPasswort")}' \
@@ -33,8 +33,6 @@ def jsonResponse(data):
 ###### E-Mail: userelement["email"]
 ###### Passwort: userelement["pwsha256"] <- Dieses Feld soll einen SHA256-Hash von dem Passwort enthalten, dieser ist gesaltet mit "TUCLAB21"
 pwsalt = "TUCLAB21"
-
-
 
 
 def getAllUsers():
@@ -74,17 +72,17 @@ def registerUser():
     if (reqJson["email"] != reqJson["emailconfirm"] or reqJson["password"] != reqJson["passwordconfirm"]):
         bestesAntwortDict["msg"] = "E-Mail-Adressen oder Passwörter stimmen nicht überein."
         bestesAntwortDict["successful"] = False
-        return json.dumps(bestesAntwortDict)
+        return dumps(bestesAntwortDict)
     if (request.get_json(force=True)["name"] == ""):
         bestesAntwortDict["msg"] = "Name darf nicht leer sein."
         bestesAntwortDict["successful"] = False
-        return json.dumps(bestesAntwortDict)
+        return dumps(bestesAntwortDict)
     iniLoginToken = generateLoginToken()
     newuser = {"name": reqJson["name"], "email":  reqJson["email"],"pwsha256": generatePWhash(request.json["password"]), "pots": [], "tokens":[iniLoginToken]}
     new_id = mycol.insert_one(newuser).inserted_id
     bestesAntwortDict["successful"] = True
     bestesAntwortDict["initialToken"] = iniLoginToken
-    return json.dumps(bestesAntwortDict)
+    return dumps(bestesAntwortDict)
 
 
 @users.route('/api/users/loginRequest', methods=["POST"])
@@ -109,6 +107,7 @@ def attemptLogin():
         bestesAntwortDict["msg"] = "Login nicht erfolgreich"
         bestesAntwortDict["loginSuccessful"] = False
     return json.dumps(bestesAntwortDict)
+
 
 @users.route('/api/users/logoutRequest', methods=["POST"])
 def attemptLogout():
@@ -139,7 +138,7 @@ def getUserInfobyToken():
         bestesAntwortDict["error"] = True
         return jsonResponse(json.dumps(bestesAntwortDict))
     else:
-        return jsonResponse(str(susUser))
+        return jsonResponse(dumps(susUser))
 
 @users.route('/api/users/newPot', methods=["POST"])
 def createNewPot():
