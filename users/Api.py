@@ -155,7 +155,7 @@ def getUserInfobyToken():
 def createNewPot():
     # Diese Funktion bekommt einen Login-Token übergeben. Sie denkt sich einen Pot-Token für den neuen Pot aus, erzeugt ihn und fügen ihn hinzu
     bestesAntwortDict = {}
-    susUser = mycol.find_one({"tokens": request.json["token"]})
+    susUser = mycol.find_one({"tokens": request.get_json(force=True)["token"]})
     if susUser == None:
         # Wenn nach dieser Suchaktion susUser None ist, dann war das kein richtiger Token!
         bestesAntwortDict["msg"] = "Incorrect token"
@@ -169,7 +169,7 @@ def createNewPot():
         newPot["waterAmmountML"] = 0;
         susUser["pots"].append(newPot)
         mycol.save(susUser)
-        return jsonResponse({"potToken": newPot["token"]})
+        return
 
 
 @users.route('/api/users/deletePot', methods=["POST"])
@@ -199,11 +199,12 @@ def deletePot():
         return jsonResponse(json.dumps(bestesAntwortDict))
 
 
-@users.route('/api/users/newPot', methods=["POST"])
+@users.route('/api/users/changePot', methods=["POST"])
 def setPotValues():
     # Diese Funktion bekommt einen Login-Token, einen Pot-Token, einen sleepTime-Wert (optional), einen criticalMoisture-Wert übergeben. Sie denkt sich einen Pot-Token für den neuen Pot aus, erzeugt ihn und fügen ihn hinzu
     bestesAntwortDict = {}
-    susUser = mycol.find_one({"tokens": request.json["token"]})
+    reqJson = request.get_json(force=True)
+    susUser = mycol.find_one({"tokens": reqJson["token"]})
     if susUser == None:
         # Wenn nach dieser Suchaktion susUser None ist, dann war das kein richtiger Token!
         bestesAntwortDict["msg"] = "Incorrect token"
@@ -213,17 +214,18 @@ def setPotValues():
         # Gucken, ob dieser User einen Pot mit diesem PotToken hat, und wenn ja dessen Daten ändern
         wasFoundAndEdited = False
         for pot in susUser["pots"]:
-            if (pot["token"] == request.json["PotToken"]):
-                if "sleepTime" in request.json.keys():
-                    pot["sleepTime"] = request.json["sleepTime"];
-                if "criticalMoisture" in request.json.keys():
-                    pot["criticalMoisture"] = request.json["criticalMoisture"];
-                if "waterAmmountML" in request.json.keys():
-                    pot["waterAmmountML"] = request.json["waterAmmountML"];
+            if (pot["token"] == reqJson["PotToken"]):
+                if "sleepTime" in reqJson.keys():
+                    pot["sleepTime"] = reqJson["sleepTime"];
+                if "criticalMoisture" in reqJson.keys():
+                    pot["criticalMoisture"] = reqJson["criticalMoisture"];
+                if "waterAmmountML" in reqJson.keys():
+                    pot["waterAmmountML"] = reqJson["waterAmmountML"];
 
                 wasFoundAndEdited = True
                 mycol.save(susUser)
+                return
         if not wasFoundAndEdited:
             bestesAntwortDict["msg"] = "Pot either not existing or not yours"
             bestesAntwortDict["error"] = True
-            return jsonResponse(json.dumps(bestesAntwortDict))
+            return jsonResponse(dumps(bestesAntwortDict))
