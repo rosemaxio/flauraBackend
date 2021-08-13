@@ -70,16 +70,17 @@ def registerUser():
     ### Diese Funktion möchte einen Namen, zwei E-Mails, zwei Passwörter und trägt den User in die DB ein
     ###                            "name", "email", "emailconfirm", "password", "passwordconfirm"
     bestesAntwortDict = {}
-    if (request.json["email"] != request.json["emailconfirm"] or request.json["password"] != request.json["passwordconfirm"]):
+    reqJson = request.get_json(force=True)
+    if (reqJson["email"] != reqJson["emailconfirm"] or reqJson["password"] != reqJson["passwordconfirm"]):
         bestesAntwortDict["msg"] = "E-Mail-Adressen oder Passwörter stimmen nicht überein."
         bestesAntwortDict["successful"] = False
         return json.dumps(bestesAntwortDict)
-    if (request.json["name"] == ""):
+    if (request.get_json(force=True)["name"] == ""):
         bestesAntwortDict["msg"] = "Name darf nicht leer sein."
         bestesAntwortDict["successful"] = False
         return json.dumps(bestesAntwortDict)
     iniLoginToken = generateLoginToken()
-    newuser = {"name": request.json["name"], "email":  request.json["email"],"pwsha256": generatePWhash(request.json["password"]), "pots": [], "tokens":[iniLoginToken]}
+    newuser = {"name": reqJson["name"], "email":  reqJson["email"],"pwsha256": generatePWhash(request.json["password"]), "pots": [], "tokens":[iniLoginToken]}
     new_id = mycol.insert_one(newuser).inserted_id
     bestesAntwortDict["successful"] = True
     bestesAntwortDict["initialToken"] = iniLoginToken
@@ -89,10 +90,11 @@ def registerUser():
 @users.route('/api/users/loginRequest', methods=["POST"])
 def attemptLogin():
     bestesAntwortDict = {}
-    susUser = mycol.find_one({"email": request.json["email"]})
+    reqJson = request.get_json(force=True)
+    susUser = mycol.find_one({"email": reqJson["email"]})
     ## ToDo: Was machen wir, wenn es diesen User gar nicht gibt? Was kommt dann als Antowort zurück? Niemand weiß es...
     # Gucke, ob das was wir gesendet bekommen haben nachdem es durch die Funktion gejagt wurde mit dem übereinstimmt was bei uns in der DB steht
-    if (generatePWhash(request.json["password"]) == susUser["pwsha256"]):
+    if (generatePWhash(reqJson["password"]) == susUser["pwsha256"]):
         bestesAntwortDict["msg"] = "Login erfolgreich"
         ## Wir generieren uns einen Token, mit dem man sich dann später identifizieren kann
         newtoken = generateLoginToken()
@@ -111,7 +113,7 @@ def attemptLogin():
 @users.route('/api/users/logoutRequest', methods=["POST"])
 def attemptLogout():
     bestesAntwortDict = {}
-    susUser = mycol.find_one({"tokens": request.json["token"]})
+    susUser = mycol.find_one({"tokens": request.get_json(force=True)["token"]})
     ## ToDo: Was machen wir, wenn es diesen User gar nicht gibt? Was kommt dann als Antowort zurück? Niemand weiß es...
     # Diese Funktion löscht den Login-Token, mit dem sie aufgerufen wurde aus der DB
     if (susUser != None):
@@ -130,7 +132,7 @@ def attemptLogout():
 def getUserInfobyToken():
     # Diese Funktion will einen token im POST-Header haben, und wenn es ein echter ist, kommt das entsprechende User-Objekt zurück
     bestesAntwortDict = {}
-    susUser = mycol.find_one({"tokens": request.json["token"]})
+    susUser = mycol.find_one({"tokens": request.get_json(force=True)["token"]})
     if susUser == None:
         # Wenn nach dieser Suchaktion susUser None ist, dann war das kein richtiger Token!
         bestesAntwortDict["msg"] = "Incorrect token"
