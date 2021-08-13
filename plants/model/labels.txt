@@ -1,2 +1,4 @@
-0 chamaedorea elegans
-1 dypsis lutescens
+0 aloe vera
+1 ficus benjamini
+2 ficus ginseng
+3 dypsis lutescens
